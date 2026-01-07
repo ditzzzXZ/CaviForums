@@ -1,10 +1,9 @@
 import { NextResponse } from 'next/server';
 
-// Next.js now expects the function name to match the filename "proxy"
-export function proxy(request) {
+export default function (request) {
   const { pathname } = request.nextUrl;
   
-  // Skip system files and images
+  // 1. Skip system files
   if (
     pathname.startsWith('/_next') || 
     pathname.includes('/api/') || 
@@ -13,15 +12,18 @@ export function proxy(request) {
     return;
   }
 
+  // 2. Define locales
   const locales = ['en', 'id', 'ms', 'ja', 'zh', 'es', 'es-MX'];
-  const pathnameIsMissingLocale = locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  const hasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
   );
 
-  // If no language is present, redirect to English (/en)
-  if (pathnameIsMissingLocale) {
+  // 3. Redirect if missing locale
+  if (!hasLocale) {
     return NextResponse.redirect(new URL(`/en${pathname}`, request.url));
   }
+  
+  return NextResponse.next();
 }
 
 export const config = {
