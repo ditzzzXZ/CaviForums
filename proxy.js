@@ -1,22 +1,26 @@
 import { NextResponse } from 'next/server';
 
-export function middleware(request) {
+// Next.js now expects the function name to match the filename "proxy"
+export function proxy(request) {
   const { pathname } = request.nextUrl;
   
-  // 1. Skip system files
-  if (pathname.includes('.') || pathname.startsWith('/_next')) return;
+  // Skip system files and images
+  if (
+    pathname.startsWith('/_next') || 
+    pathname.includes('/api/') || 
+    pathname.includes('.')
+  ) {
+    return;
+  }
 
-  // 2. Define your 7 languages
   const locales = ['en', 'id', 'ms', 'ja', 'zh', 'es', 'es-MX'];
-  
-  // 3. Check if URL already has one
-  const hasLocale = locales.some(l => pathname.startsWith(`/${l}/`) || pathname === `/${l}`);
+  const pathnameIsMissingLocale = locales.every(
+    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+  );
 
-  // 4. If no language, go to /en
-  if (!hasLocale) {
-    const url = request.nextUrl.clone();
-    url.pathname = `/en${pathname}`;
-    return NextResponse.redirect(url);
+  // If no language is present, redirect to English (/en)
+  if (pathnameIsMissingLocale) {
+    return NextResponse.redirect(new URL(`/en${pathname}`, request.url));
   }
 }
 
