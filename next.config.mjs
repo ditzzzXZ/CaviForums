@@ -1,9 +1,5 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  i18n: {
-    locales: ['en', 'id', 'ms', 'ja', 'zh', 'es', 'es-MX'],
-    defaultLocale: 'en',
-    localeDetection: true,
-  },
+  /* App Router handles languages via [locale] folders, so we leave this empty */
 };
 export default nextConfig;
