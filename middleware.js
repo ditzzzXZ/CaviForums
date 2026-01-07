@@ -2,12 +2,26 @@ import { NextResponse } from 'next/server';
 
 export function middleware(request) {
   const { pathname } = request.nextUrl;
+  
+  // Define supported locales
   const locales = ['en', 'id', 'ms', 'ja', 'zh', 'es', 'es-MX'];
-  const isMissing = locales.every(l => !pathname.startsWith(`/${l}/`) && pathname !== `/${l}`);
+  
+  // Check if the URL already has a locale
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  );
 
-  if (isMissing) {
-    const locale = request.headers.get('accept-language')?.split(',')?.[0].split('-')?.[0] || 'en';
-    return NextResponse.redirect(new URL(`/${locales.includes(locale) ? locale : 'en'}${pathname}`, request.url));
-  }
+  if (pathnameHasLocale) return;
+
+  // Redirect if there is no locale
+  const locale = 'en'; // Default to English for now
+  request.nextUrl.pathname = `/${locale}${pathname}`;
+  return NextResponse.redirect(request.nextUrl);
 }
-export const config = { matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'] };
+
+export const config = {
+  matcher: [
+    // Skip all internal paths (_next, api, etc)
+    '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  ],
+};
