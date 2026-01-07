@@ -1,23 +1,26 @@
 import "../globals.css";
 
 export default function RootLayout({ children, params }) {
-  // Add a fallback so it doesn't crash without middleware
-  const locale = params?.locale || 'en'; 
+  // Safe locale detection
+  const locale = params?.locale || 'en';
   
-  const navLabels = { 
-    en: "Search", id: "Cari", ja: "検索", ms: "Cari", 
-    zh: "搜索", es: "Buscar", "es-MX": "Buscar" 
-  };
-  const label = navLabels[locale] || navLabels.en;
-
   return (
     <html lang={locale}>
       <head>
         <script src="https://cdn.tailwindcss.com"></script>
       </head>
       <body className="bg-[#F0F2F5] text-slate-900 antialiased">
-         {/* ... (keep the rest of the nav and main code the same) ... */}
-         {children}
+        <nav className="bg-white border-b sticky top-0 z-50 shadow-sm">
+          <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+            <h1 className="font-black text-2xl text-orange-600 italic tracking-tighter">CAVI'S</h1>
+            <div className="flex gap-4 text-xs font-bold uppercase text-gray-400">
+              <a href="/en" className="hover:text-orange-600">EN</a>
+              <a href="/id" className="hover:text-orange-600">ID</a>
+              <a href="/ja" className="hover:text-orange-600">JA</a>
+            </div>
+          </div>
+        </nav>
+        <main className="max-w-6xl mx-auto py-8 px-4">{children}</main>
       </body>
     </html>
   );
